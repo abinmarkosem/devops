@@ -1,0 +1,291 @@
+DevOps Pre-Requisite Course
+===============================
+
+CentOS free community edition from RH
+
+Shell types:
+============
+	CLI - text based
+		- helps to run commands to interact with OS is known as shel
+		- sh (bourne shell), C shell, Z shell, Bourne again shell (bash)
+		- echo $SHELL  --> print the type of shell
+
+Linux basic commands
+==============
+		
+		- echo Hi  									--> print to screen
+		- ls 										--> list files and folders
+		- cd 										--> change directory
+		- pwd										--> print present directory
+		- mkdir										--> create new directory
+													--> to run multiple commands user ; 
+		- mkdir - p 						 		--> use -p with mkdir; mkdir -p /tmp/asia/india/bangalore
+		- rm -r 									--> remove contents and dir
+		- cp -r 									--> to copy directory; cp -r my_dir /tmp/mydir_1	
+		
+		- touch <file> 								--> create new file with no content
+		- cat > <file_name>							--> add content to afile
+		- cat <file_name>							--> view the content of file
+		
+		- cp <src> <dest>							--> copy file
+		- mv <src> <dest>							--> move/rename 	
+		- rm <file>									--> remove
+		
+		
+		Examples:
+		
+			- ls /home/thor/test_dir
+			- cd /home/thor/; touch empty_file.txt
+			- echo "This is not empty file" > /home/thor/contents_file.txt
+			- cat > /home/thor/contents_file1.txt
+			- mkdir /home/thor/empty_dir
+			- mkdir -p /home/thor/asia/india/bangalore
+			- cp /home/thor/asia/bangalore.txt /home/thor/asia/india/bangalore/
+			- cp -r /home/thor/asia/india/bangalore/ /home/thor
+			- rm /home/thor/asia/bangalore.txt
+			- rm -f /home/thor/asia/bangalore.txt
+			- rm -r /home/thor/asia/india/bangalore
+			- 
+			
+			
+Vi Editor
+=========
+
+			- vi <file_name>
+			- command mode (default mode) and insert mode (to edit files  --> press i, two switch bacn press Esc key)
+			- K (up), J (down), H (left), L (reight)
+			- x --> to delete
+			- dd --> delete entire line
+			- yy --> copy a line
+			- p --> paste
+			- Ctrl+dd or Ctrl+u --> to scroll page
+			- : --> take ot prompt where we can type commadns
+			- :w --> to save 
+			- :q --> to quit without saving
+			- :wq --> to save and exit
+			- /of --> all occurrances of 'of' will be highlighted n --> to move to the next occurance.
+
+
+More Linux commands:
+====================
+	
+			- whoami
+			- id
+			- su abin
+			- ssh <user>@<host_name>
+			- sudo --> as root; for this the user entry should be there in /etc/sudoers: visudo -f /etc/sudoers
+			
+			- curl <link> -O (caps O) --> to download the file and print the result to a file
+				- curlt http://www.somesite.com/somefile.txt -O
+			- wget 	
+			    - wget http://www.somesite.com/somefile.txt -O some-file.txt
+			- wget https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf -O abin.pdf -- the file will be saved as abin,pdf
+								
+			- ls /etc/*release* --> list all the releases files
+			- cat /etc/*release* --> display OS details
+			
+			
+			
+Package Management
+==================
+
+	Centos use - rpm (redhat package manager); won't take care about dependencies. It just install the package.
+
+	- rpm -i telnet.rpm --> to insall telnet package
+	- rpm -e telnet.rpm --> to uninstall telnet package
+	- rpm -q telent.rpm --> to query telnet package
+	
+
+	yum - another package manager and it uses RPM underneath. It will install the dependencies and the package. 
+		- yum will search for the repositories (local/remove/internet)
+		- repositires information are present in /etc/yum.repos.d directory
+		- every OS comes bundled with its own repositories
+		- yum repolist --> to find the repos avialble
+		- ls /etc/yum.repos.d --> will contains the repos avialble. In these files the baseurl will be there
+		- yum list --> list all the installed packages
+		- yum list <packag_name> --> list info about the installed ansible package
+		- rum remove ansible --> will remove ansibel
+		- yum --showduplicates list ansible --> list all the packages for ansible
+		- yum install ansible-2.4.2.0 --> will install Ansible version 2.4.2.0
+		
+		Examples:
+		- rpm -q telnet python3 ansible openssh-server --> quest for the packages
+			telnet-0.17-66.el7.x86_64
+			python3-3.6.8-18.el7.x86_64
+			package ansible is not installed
+			openssh-server-7.4p1-21.el7.x86_64
+		- sudo rpm -i /opt/ftp-0.17-67.el7.x86_64.rpm --> install ftp from /opt folder
+		- rpm -q ftp-0.17-67.el7.x86_64
+				ftp-0.17-67.el7.x86_64
+		- rpm -qa | grep ftp --> to query ftp
+				ftp-0.17-67.el7.x86_64
+		- sudo rpm -e ftp-0.17-67.el7.x86_64
+		- sudo yum -y install ansible
+		- sudo yum -y remove ansible
+		- sudo yum install ansible-2.8.11 -y
+		
+		
+Services
+========
+
+	- Services in Linux help us to run software in the background and make sure they run automatically when server is rebooted and started in the correct order.
+	
+	- service httpd start OR systemctl start httpd (servie uses systemctl underneath)
+	- systemctl stop httpd
+	- systemctl status httpd
+	- systemctl enable httpd
+	- systemctl disable httpd
+	
+	How to configure a program as a service?
+	----------------------------------------
+	
+	We need to configure our program as a systemd service. 
+		- Create a systemd unit file under /etc/systemd/system or /usr/lib/systemd/system
+		- <name_of_the_app>.service Ex: my_app.service
+			
+			[Unit]
+			Description=My python web application 
+						
+			[Service]
+			ExecStart=/usr/bin/python3 /opt/code/my_app.py
+			ExecStartPre=/opt/code/configure_db.sh
+			ExecStartPost=/opt/code/email_status.sh
+			Restart=always
+			
+			[Install]
+			WantedBy=multi-user.target -->
+			
+			
+			
+			ExecStart --> app to be configured
+			ExecStartPre --> cmd/script before the app start
+			ExecStartPost --> cmd/script before the app stop
+			Restart --> restart the app if it crashes
+			Description --> others can understand what this service is for
+			WantedBy --> will make sure that my_app will be start after multi-user.target service during the boot (if this is required; once this is configured, we can enable the service)
+			
+		- systemctl daemon-reload --> this will let the system know there is a new service configured; will reload the configurations
+		- systemctl start my_app
+		- systemctl stop my_app
+		- systemctl enable my_app
+		
+		Examples:
+			- sudo systemctl status httpd
+			- sudo systemctl start httpd
+			- sudo systemctl enable httpd
+			- sudo systemctl stop httpd
+			- sudo systemctl disable httpd
+			
+	For VirtualBOx and other hypervisors, we need to enable virtualization Technology in BIOS.
+	If we are unable to connect to a Linux VM, please check the status of SSHD service on the guest andf or Windows the Remote Desktop Service to be running on the guest
+	
+	
+	- ip addr
+	- ip add add 192.168.29.100/24 dev eth0   (device name eth0) --> to set ip
+    - sudo vi /etc/systemconfig/network-scripts/eth0 and add IP  
+	- sudo systemctl status sshd --> to start ssh command
+			
+	Reference: https://www.tecmint.com/ip-command-examples/
+		
+		https://www.osboxes.org/ --> to download OS image discs.
+		
+
+	
+	NAT Network--> Here, the VM can contact the systems outside of the host. So, when request is send to a system outside of the host, the IP used will be used is of the host system (not the VM IP; this is donw by the NAT engine). Similarly, when we receive the reply, it will reach the host IP and the NAT engine will send it to the respective VM. In this case, no system from outside can access the guests (VMs). VMs can reach internet if host has internet
+	
+	NAT --> Similar to NAT network but, they is not internal network ie the VMs wont be able to sommunicate each other but they can connect to outside world.VMs can reach internet if host has internet
+	
+	Bridge Network: extension of LAN network. ie the VMs can be connect by systems outside the hosts. VMs will get the IPs similar to the host and external systems can connect to the VMs as the host.Can reach internet
+		
+	Host-only network --> the VMs cn connect indide the host OS; ie all the VMs can connect to each other but outside.--> no internet by default. However, the host can forward the network traffic from internel network to external network. We can use IP forwarding for this. This will make our host a router. But instead of this, we can add one more interface.
+	
+	Port forwarding --> port will allow us to map a port of the host to a port on the guest; it can same or dofferent port. For eaxmple, if we have port fowarding on 80, any traffic on port 80 on host will be forwarded to port 80 on VM.
+	
+	If you dont know the IP of the VM and we need to ssh, enable port forwarding on port 2222 on host to 22 on VM and use the loop back address of the VM to ssh to the VM on the forwrded port.
+	
+	ssh 127.0.0.1 -p 2222  (127.0.0.1 is the loop back ip of the host)
+	
+Vagrant
+=======
+
+	Visit vagrant.com and download vagrant for our OS
+	
+
+	- vagrant box contains OS and scripts to configure the environment
+	
+		- vagrant init centos/7 ---> initializes a new Vagrant command by creating a VagrantFile
+		- ls --> you will see Vagrantfile
+		- vagrant ---> will show all the vagrant cooamnds
+		- vagrant up --> starts and provisions the vagrant environment
+		- vagrant status
+		- vagrant halt
+	
+	Vagrant providers: VirtualBox, VMWare, Hyper-V, Docker, Custom
+	
+	
+		
+Networking Basics
+=================
+
+	- ip link
+	- ip addr add 192.168.29.10/24 dev eth01
+	- ping 192.168.29.10
+	- route  --> display the Kernel's routing table.
+	- ip route add 192.168.2.0/24 via 192.168.1.1. Here the treaffic to 192.168.2.0 netwok will go through the router. This has to be configure on all the systems.
+	- ip route add default via 192.168.1.1 --> traffica any network will go via the router. Instead of default we can use 0.0.0.0 (means any network)
+	
+	A switch i used to connect system in the same network.
+	A router helps connect two networks together. As it is connecting two networks, it will get two IPs.
+	If a system in one n/w wants to communicate with a system in the other network, it uses network gateway IP.
+	
+	
+	How to setup a linux host as a router?
+	-------------------------------------
+	
+	In Linux packet received on one interface is not send to any other intrfaces. That means even after setting the routing on both the hosts; network traffic will no pass through. In order to happen edit /proc/sysy/net/ipv4/ip_forward and make the vallue as 1.
+	
+	echo 1 > /proc/sysy/net/ipv4/ip_forward (this will not be permanent. In order to make this permanent, add this to /etc/sysctl.conf file.
+	
+	- ip link
+	- ip addr
+	- ip addr add
+	- ip route
+	- ip route add
+
+
+
+DNS Configurations
+==================
+	
+	
+	
+	
+					
+	
+	
+	
+	
+	
+	
+	
+
+	
+	
+	
+	
+		
+		
+		
+		
+	
+		
+			
+			
+
+
+
+			
+	
+
+
+
